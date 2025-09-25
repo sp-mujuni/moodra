@@ -18,8 +18,8 @@ import {
 
 export default function NowPlayingBar() {
   const {
-    queue,
-    currentIndex,
+    // queue, // removed unused
+    // currentIndex, // removed unused
     src,
     playing,
     togglePlay,
