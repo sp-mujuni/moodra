@@ -78,7 +78,7 @@ export default function Sidebar() {
           <div>
             <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
               <Library className="w-4 h-4 flex-shrink-0" />
-              <span className="whitespace-nowrap">Your Library</span>
+              <span className="whitespace-nowrap">My Library</span>
             </h2>
 
             {loading ? (
