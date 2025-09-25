@@ -4,17 +4,58 @@ import Sidebar from "@/components/Sidebar";
 import Playlist from "@/components/Playlist";
 import { usePlaylist } from "@/components/PlaylistContext";
 import { useSidebar } from "@/components/SidebarContext";
-import { Loader2, Music, Menu } from "lucide-react";
+import { Loader2, Music, Menu, ChevronsDown, ChevronsUp } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { usePlayer } from "@/components/PlayerContext";
 
 export default function Home() {
   const { activePlaylist, loading } = usePlaylist();
+  const { src } = usePlayer();
   const { isCollapsed, toggleSidebar, isMobile } = useSidebar();
+
+  // Ref & state for scroll navigation in main content
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [showScrollToolbar, setShowScrollToolbar] = useState(false);
+  const [atTop, setAtTop] = useState(true);
+  const [atBottom, setAtBottom] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const handleAssess = () => {
+      const { scrollTop, scrollHeight, clientHeight } = el;
+      setShowScrollToolbar(scrollHeight - clientHeight > 100); // show if overflow > 100px
+      setAtTop(scrollTop <= 10);
+      setAtBottom(scrollTop + clientHeight >= scrollHeight - 10);
+    };
+
+    handleAssess();
+    el.addEventListener("scroll", handleAssess, { passive: true });
+    window.addEventListener("resize", handleAssess);
+    return () => {
+      el.removeEventListener("scroll", handleAssess);
+      window.removeEventListener("resize", handleAssess);
+    };
+  }, [activePlaylist]);
+
+  const scrollToTop = () => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const scrollToBottom = () => {
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTo({
+      top: scrollRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <main className="flex min-h-screen bg-neutral-950">
       <Sidebar />
       <div
-        className={`flex-1 overflow-y-auto transition-all duration-300 ${
+        ref={scrollRef}
+        className={`flex-1 overflow-y-auto transition-all duration-300 relative ${
           !isMobile && !isCollapsed ? "ml-0" : ""
         }`}
       >
@@ -37,7 +78,11 @@ export default function Home() {
           </div>
         )}
 
-        <div className="p-4 md:p-6 lg:p-8 pb-24 md:pb-28">
+        <div
+          className={`p-4 md:p-6 lg:p-8 pb-24 md:pb-28 transition-[padding] duration-300 ${
+            src ? "pb-48 md:pb-56" : ""
+          }`}
+        >
           {loading ? (
             <div className="flex items-center justify-center h-64">
               <div className="text-center">
@@ -82,6 +127,36 @@ export default function Home() {
             </div>
           )}
         </div>
+
+        {/* Spacer element at bottom to ensure last item not hidden under player (extra safety) */}
+        {src && <div className="h-10 md:h-12" />}
+
+        {/* Scroll navigation toolbar (appears when overflow) */}
+        {showScrollToolbar && (
+          <div className="hidden md:flex flex-col gap-2 items-center rounded-full p-2 bg-neutral-900/70 backdrop-blur border border-neutral-700 shadow-lg fixed right-4 md:right-6 lg:right-8 bottom-32 md:bottom-36 z-40">
+            <button
+              onClick={scrollToTop}
+              disabled={atTop}
+              aria-label="Scroll to top"
+              className={`p-2 rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-neutral-800 hover:bg-neutral-700 text-gray-300 hover:text-white ${
+                atTop ? "" : "shadow-inner"
+              }`}
+            >
+              <ChevronsUp className="w-5 h-5" />
+            </button>
+            <div className="w-px h-4 bg-neutral-700" />
+            <button
+              onClick={scrollToBottom}
+              disabled={atBottom}
+              aria-label="Scroll to bottom"
+              className={`p-2 rounded-full transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-neutral-800 hover:bg-neutral-700 text-gray-300 hover:text-white ${
+                atBottom ? "" : "shadow-inner"
+              }`}
+            >
+              <ChevronsDown className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
     </main>
   );
