@@ -4,8 +4,13 @@ import { usePlayer } from "./PlayerContext";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Play, Music2, PlayCircle } from "lucide-react";
 
-export default function Playlist({ playlist }: { playlist: any }) {
-  const { playTrack, loadQueue, src } = usePlayer();
+interface PlaylistData {
+  name: string;
+  tracks: string[];
+}
+
+export default function Playlist({ playlist }: { playlist: PlaylistData }) {
+  const { /* playTrack */ loadQueue, src } = usePlayer();
 
   const formatTrackName = (track: string) => {
     return track
