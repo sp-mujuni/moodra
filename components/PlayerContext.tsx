@@ -46,12 +46,14 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audioRef.current = new Audio(src);
       audioRef.current.volume = volume;
 
-      audioRef.current.addEventListener("timeupdate", () => {
+      const updateProgress = () => {
+        if (!audioRef.current || isNaN(audioRef.current.duration)) return;
         setProgress(
-          (audioRef.current!.currentTime / audioRef.current!.duration) * 100
+          (audioRef.current.currentTime / audioRef.current.duration) * 100
         );
-      });
+      };
 
+      audioRef.current.addEventListener("timeupdate", updateProgress);
       audioRef.current.addEventListener("ended", handleTrackEnd);
 
       if (playing) {
@@ -63,6 +65,9 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       audioRef.current?.removeEventListener("ended", handleTrackEnd);
       audioRef.current = null;
     };
+    // We intentionally exclude handleTrackEnd (stable) by lint directive below.
+    // volume & playing are intentionally not dependencies to avoid restarting audio when they change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
   // Handle track end
@@ -110,8 +115,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const seek = (val: number) => {
     if (audioRef.current) {
-      audioRef.current.currentTime =
-        (val / 100) * audioRef.current.duration;
+      audioRef.current.currentTime = (val / 100) * audioRef.current.duration;
     }
   };
 
