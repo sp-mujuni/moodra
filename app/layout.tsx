@@ -6,7 +6,7 @@ import { SidebarProvider } from "@/components/SidebarContext";
 import NowPlayingBar from "@/components/NowPlayingBar";
 
 export const metadata: Metadata = {
-  title: "Moodra - Your Music Player",
+  title: "Moodra - Play your mood",
   description: "A sleek personal music player for all your moods",
 };
 
