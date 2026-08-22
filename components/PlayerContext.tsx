@@ -13,6 +13,8 @@ type PlayerContextType = {
   playing: boolean;
   togglePlay: () => void;
   progress: number;
+  currentTime: number;
+  duration: number;
   seek: (val: number) => void;
   volume: number;
   setVolume: (val: number) => void;
@@ -35,6 +37,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const [volume, setVolumeState] = useState(0.8);
 
   const [shuffle, setShuffle] = useState(false);
@@ -48,6 +52,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
 
       const updateProgress = () => {
         if (!audioRef.current || isNaN(audioRef.current.duration)) return;
+        setCurrentTime(audioRef.current.currentTime);
+        setDuration(audioRef.current.duration);
         setProgress(
           (audioRef.current.currentTime / audioRef.current.duration) * 100
         );
@@ -184,6 +190,8 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
         playing,
         togglePlay,
         progress,
+        currentTime,
+        duration,
         seek,
         volume,
         setVolume,
