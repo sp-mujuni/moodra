@@ -48,7 +48,7 @@ export default function Playlist({ playlist }: { playlist: PlaylistData }) {
           </button>
         </CardHeader>
       )}
-      <CardContent className="p-0">
+      <CardContent className="p-0 pb-20 md:pb-24">
         <div className="space-y-0">
           {playlist.tracks.map((track: string, index: number) => {
             const trackSrc = `/music/${playlist.name}/${track}`;
