@@ -24,6 +24,8 @@ export default function NowPlayingBar() {
     playing,
     togglePlay,
     progress,
+    currentTime,
+    duration,
     seek,
     volume,
     setVolume,
@@ -77,6 +79,13 @@ export default function NowPlayingBar() {
     );
   };
 
+  const formatTime = (seconds: number) => {
+    if (isNaN(seconds) || seconds === 0) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
   return (
     <div
       className={`fixed bottom-0 right-0 bg-neutral-900 border-t border-neutral-800 p-3 md:p-4 flex flex-col z-40 transition-all duration-300 ease-in-out ${
@@ -90,37 +99,37 @@ export default function NowPlayingBar() {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center gap-1 md:gap-3 flex-shrink-0">
+        <div className="flex items-center gap-0.5 md:gap-3 flex-shrink-0">
           <Button
             variant={shuffle ? "default" : "ghost"}
             size="icon"
-            className={`hidden md:flex ${
+            className={`h-7 w-7 md:h-10 md:w-10 ${
               shuffle ? "bg-green-500 hover:bg-green-600" : ""
             }`}
             onClick={toggleShuffle}
           >
-            <Shuffle className="w-4 h-4 md:w-5 md:h-5" />
+            <Shuffle className="w-3.5 h-3.5 md:w-5 md:h-5" />
           </Button>
 
           <Button
             variant="ghost"
             size="icon"
             onClick={prevTrack}
-            className="h-8 w-8 md:h-10 md:w-10"
+            className="h-7 w-7 md:h-10 md:w-10"
           >
-            <SkipBack className="w-4 h-4 md:w-5 md:h-5" />
+            <SkipBack className="w-3.5 h-3.5 md:w-5 md:h-5" />
           </Button>
 
           <Button
             variant="default"
             size="icon"
-            className="bg-green-500 hover:bg-green-600 h-10 w-10 md:h-12 md:w-12"
+            className="bg-green-500 hover:bg-green-600 h-9 w-9 md:h-12 md:w-12"
             onClick={togglePlay}
           >
             {playing ? (
-              <Pause className="w-5 h-5 md:w-6 md:h-6" />
+              <Pause className="w-4 h-4 md:w-6 md:h-6" />
             ) : (
-              <Play className="w-5 h-5 md:w-6 md:h-6" />
+              <Play className="w-4 h-4 md:w-6 md:h-6" />
             )}
           </Button>
 
@@ -128,20 +137,20 @@ export default function NowPlayingBar() {
             variant="ghost"
             size="icon"
             onClick={nextTrack}
-            className="h-8 w-8 md:h-10 md:w-10"
+            className="h-7 w-7 md:h-10 md:w-10"
           >
-            <SkipForward className="w-4 h-4 md:w-5 md:h-5" />
+            <SkipForward className="w-3.5 h-3.5 md:w-5 md:h-5" />
           </Button>
 
           <Button
             variant={repeat === "off" ? "ghost" : "default"}
             size="icon"
-            className={`hidden md:flex h-8 w-8 md:h-10 md:w-10 ${
+            className={`h-7 w-7 md:h-10 md:w-10 ${
               repeat !== "off" ? "bg-green-500 hover:bg-green-600" : ""
             }`}
             onClick={toggleRepeat}
           >
-            <Repeat className="w-4 h-4 md:w-5 md:h-5" />
+            <Repeat className="w-3.5 h-3.5 md:w-5 md:h-5" />
           </Button>
         </div>
 
@@ -179,14 +188,20 @@ export default function NowPlayingBar() {
       </div>
 
       {/* Progress bar */}
-      <div className="mt-2 md:mt-3">
+      <div className="mt-2 md:mt-3 flex items-center gap-2">
+        <span className="text-[10px] md:text-xs text-gray-400 w-9 text-right tabular-nums">
+          {formatTime(currentTime)}
+        </span>
         <Slider
           value={[progress]}
           max={100}
           step={1}
           onValueChange={(val) => seek(val[0])}
-          className="[&>*:first-child]:bg-white [&>*:first-child>*]:bg-green-500 [&>*:last-child]:bg-green-500 [&>*:last-child]:border-green-500 [&>*:last-child]:rounded-full [&>*:last-child]:h-4 [&>*:last-child]:w-4"
+          className="flex-1 [&>*:first-child]:bg-white [&>*:first-child>*]:bg-green-500 [&>*:last-child]:bg-green-500 [&>*:last-child]:border-green-500 [&>*:last-child]:rounded-full [&>*:last-child]:h-4 [&>*:last-child]:w-4"
         />
+        <span className="text-[10px] md:text-xs text-gray-400 w-9 tabular-nums">
+          {formatTime(duration)}
+        </span>
       </div>
     </div>
   );
